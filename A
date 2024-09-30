@@ -1,85 +1,59 @@
+-- Script Name: CoolLuaScript
+-- Description: A cool Lua script for Roblox Fluxus with a unique GUI design
+
 -- Services
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local GuiService = game:GetService("GuiService")
 
--- GUI
+-- Variables
+local player = Players.LocalPlayer
+local character = player.Character
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Create a new ScreenGui
 local gui = Instance.new("ScreenGui")
-local mainFrame = Instance.new("Frame")
-local title = Instance.new("TextLabel")
-local settingsButton = Instance.new("TextButton")
-local effectsButton = Instance.new("TextButton")
-
--- Customizable settings
-local settings = {
-    animationSpeed = 1,
-    effectIntensity = 1
-}
-
--- Load GUI
 gui.Parent = game.Players.LocalPlayer.PlayerGui
-mainFrame.Parent = gui
-mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
-mainFrame.BackgroundTransparency = 0.5
+
+-- Create a main frame for the GUI
+local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 300, 0, 200)
 mainFrame.Position = UDim2.new(0, 50, 0, 50)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+mainFrame.BackgroundTransparency = 0.5
+mainFrame.Parent = gui
 
-title.Parent = mainFrame
-title.Font = Enum.Font.SourceSans
-title.FontSize = Enum.FontSize.Size24
-title.TextColor3 = Color3.new(1, 1, 1)
-title.TextStrokeColor3 = Color3.new(0, 0, 0)
-title.TextStrokeTransparency = 0.5
-title.Text = "Fluxus Lua Script"
+-- Create a title label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(0, 200, 0, 30)
+titleLabel.Position = UDim2.new(0, 50, 0, 20)
+titleLabel.Font = Enum.Font.SourceSans
+titleLabel.FontSize = Enum.FontSize.Size24
+titleLabel.TextColor3 = Color3.new(1, 1, 1) -- White text
+titleLabel.TextStrokeColor3 = Color3.new(0, 0, 0) -- Black outline
+titleLabel.TextStrokeTransparency = 0.5
+titleLabel.Text = "Cool Lua Script"
+titleLabel.Parent = mainFrame
 
-settingsButton.Parent = mainFrame
-settingsButton.BackgroundColor3 = Color3.new(0, 0, 0)
-settingsButton.BackgroundTransparency = 0.5
-settingsButton.Size = UDim2.new(0, 100, 0, 30)
-settingsButton.Position = UDim2.new(0, 50, 0, 70)
-settingsButton.Font = Enum.Font.SourceSans
-settingsButton.FontSize = Enum.FontSize.Size18
-settingsButton.TextColor3 = Color3.new(1, 1, 1)
-settingsButton.TextStrokeColor3 = Color3.new(0, 0, 0)
-settingsButton.TextStrokeTransparency = 0.5
-settingsButton.Text = "Settings"
+-- Create a button with a custom shape
+local button = Instance.new("ImageButton")
+button.Size = UDim2.new(0, 100, 0, 30)
+button.Position = UDim2.new(0, 50, 0, 70)
+button.Image = "rbxassetid://1234567890" -- Replace with your custom image
+button.ImageColor3 = Color3.new(1, 1, 1) -- White image
+button.ScaleType = Enum.ScaleType.Fit
+button.Parent = mainFrame
 
-effectsButton.Parent = mainFrame
-effectsButton.BackgroundColor3 = Color3.new(0, 0, 0)
-effectsButton.BackgroundTransparency = 0.5
-effectsButton.Size = UDim2.new(0, 100, 0, 30)
-effectsButton.Position = UDim2.new(0, 50, 0, 110)
-effectsButton.Font = Enum.Font.SourceSans
-effectsButton.FontSize = Enum.FontSize.Size18
-effectsButton.TextColor3 = Color3.new(1, 1, 1)
-effectsButton.TextStrokeColor3 = Color3.new(0, 0, 0)
-effectsButton.TextStrokeTransparency = 0.5
-effectsButton.Text = "Effects"
+-- Add a hover effect to the button
+local hoverEffect = Instance.new("TweenInfo")
+hoverEffect.Property = "ImageColor3"
+hoverEffect.Value = Color3.new(0.5, 0.5, 0.5) -- Gray image on hover
+hoverEffect.Duration = 0.2
+TweenService:Create(button, hoverEffect):Play()
 
--- Settings function
-local function settingsFunction()
-    -- Create settings menu
-    local settingsMenu = Instance.new("Frame")
-    settingsMenu.Parent = gui
-    settingsMenu.BackgroundColor3 = Color3.new(0, 0, 0)
-    settingsMenu.BackgroundTransparency = 0.5
-    settingsMenu.Size = UDim2.new(0, 200, 0, 150)
-    settingsMenu.Position = UDim2.new(0, 50, 0, 50)
-
-    -- Animation speed slider
-    local animationSpeedSlider = Instance.new("Slider")
-    animationSpeedSlider.Parent = settingsMenu
-    animationSpeedSlider.BackgroundColor3 = Color3.new(0, 0, 0)
-    animationSpeedSlider.BackgroundTransparency = 0.5
-    animationSpeedSlider.Size = UDim2.new(0, 150, 0, 20)
-    animationSpeedSlider.Position = UDim2.new(0, 25, 0, 25)
-    animationSpeedSlider.MinValue = 0.1
-    animationSpeedSlider.MaxValue = 5
-    animationSpeedSlider.Value = settings.animationSpeed
-
-    -- Effect intensity slider
-    local effectIntensitySlider = Instance.new("Slider")
-    effectIntensitySlider.Parent = settingsMenu
-    effectIntensitySlider.BackgroundColor3 = Color3.new(0, 0, 0)
-    effectIntensitySlider.BackgroundTransparency = 0.5
-    effectIntensitySlider.Size = UDim2.new(0, 150, 0, 20
+-- Add a click event to the button
+local function onClick()
+    -- Code to handle button click goes here
+end
+button.Activated:Connect(onClick)

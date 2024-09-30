@@ -1,0 +1,97 @@
+-- Script Name: CoolLuaScript
+-- Description: A cool Lua script for Roblox Fluxus with a unique GUI design
+
+-- Services
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local GuiService = game:GetService("GuiService")
+
+-- Variables
+local player = Players.LocalPlayer
+local character = player.Character
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Create a new ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Parent = game.Players.LocalPlayer.PlayerGui
+
+-- Create a main frame for the GUI
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 400, 0, 300)
+mainFrame.Position = UDim2.new(0, 50, 0, 50)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+mainFrame.BackgroundTransparency = 0.5
+mainFrame.Parent = gui
+
+-- Create a rounded corner frame
+local roundedFrame = Instance.new("Frame")
+roundedFrame.Size = UDim2.new(0, 400, 0, 300)
+roundedFrame.Position = UDim2.new(0, 50, 0, 50)
+roundedFrame.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+roundedFrame.BackgroundTransparency = 0.5
+roundedFrame.CornerRadius = UDim.new(0, 10)
+roundedFrame.Parent = mainFrame
+
+-- Create a title label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(0, 200, 0, 30)
+titleLabel.Position = UDim2.new(0, 50, 0, 20)
+titleLabel.Font = Enum.Font.SourceSans
+titleLabel.FontSize = Enum.FontSize.Size24
+titleLabel.TextColor3 = Color3.new(1, 1, 1) -- White text
+titleLabel.TextStrokeColor3 = Color3.new(0, 0, 0) -- Black outline
+titleLabel.TextStrokeTransparency = 0.5
+titleLabel.Text = "Cool Lua Script"
+titleLabel.Parent = roundedFrame
+
+-- Create a toggle button with a picture
+local toggleButton = Instance.new("ImageButton")
+toggleButton.Size = UDim2.new(0, 40, 0, 40)
+toggleButton.Position = UDim2.new(0, 10, 1, -50)
+toggleButton.Image = "rbxassetid://7229442422" -- Replace with your custom image
+toggleButton.ImageColor3 = Color3.new(1, 1, 1) -- White image
+toggleButton.ScaleType = Enum.ScaleType.Fit
+toggleButton.Parent = gui
+
+-- Add a hover effect to the toggle button
+local hoverEffect = Instance.new("TweenInfo")
+hoverEffect.Property = "ImageColor3"
+hoverEffect.Value = Color3.new(0.5, 0.5, 0.5) -- Gray image on hover
+hoverEffect.Duration = 0.2
+TweenService:Create(toggleButton, hoverEffect):Play()
+
+-- Add a click event to the toggle button
+local isOpen = false
+local function onToggle()
+    if isOpen then
+        mainFrame.Visible = false
+        isOpen = false
+    else
+        mainFrame.Visible = true
+        isOpen = true
+    end
+end
+toggleButton.Activated:Connect(onToggle)
+
+-- Add a drag functionality to the GUI
+local dragService = game:GetService("UserInputService")
+local dragToggle = nil
+local dragInput = nil
+local dragStartPos = nil
+local function updateDrag(input)
+    local delta = input.Position - dragStartPos
+    mainFrame.Position = UDim2.new(0, dragStartPos.X + delta.X, 0, dragStartPos.Y + delta.Y)
+end
+local function startDrag(input)
+    dragStartPos = input.Position
+    dragInput = input
+    dragToggle = true
+    dragService.InputChanged:Connect(updateDrag)
+end
+local function endDrag(input)
+    dragToggle = false
+    dragService.InputChanged:Disconnect(updateDrag)
+end
+roundedFrame.InputBegan:Connect(startDrag)
+roundedFrame.InputEnded:Connect(endDrag)

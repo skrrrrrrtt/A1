@@ -1,0 +1,90 @@
+-- Fluxus Script for Lumberjack Tycoon 2: Auto-Chopping with GUI
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local chopping = false
+
+-- Change this to the position where you want to bring the logs
+local homePosition = Vector3.new(0, 0, 0) -- Replace with your land's coordinates
+
+-- Create GUI
+local screenGui = Instance.new("ScreenGui")
+local frame = Instance.new("Frame")
+local chopButton = Instance.new("TextButton")
+local stopButton = Instance.new("TextButton")
+local teleportButton = Instance.new("TextButton")
+
+-- Configure GUI
+screenGui.Parent = player.PlayerGui
+frame.Size = UDim2.new(0, 200, 0, 150)
+frame.Position = UDim2.new(0.5, -100, 0.5, -75)
+frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+-- Chop Button
+chopButton.Size = UDim2.new(0, 180, 0, 40)
+chopButton.Position = UDim2.new(0, 10, 0, 10)
+chopButton.Text = "Start Chopping"
+chopButton.Parent = frame
+chopButton.BackgroundColor3 = Color3.new(0, 0.7, 0)
+
+-- Stop Button
+stopButton.Size = UDim2.new(0, 180, 0, 40)
+stopButton.Position = UDim2.new(0, 10, 0, 60)
+stopButton.Text = "Stop Chopping"
+stopButton.Parent = frame
+stopButton.BackgroundColor3 = Color3.new(0.7, 0, 0)
+
+-- Teleport Button
+teleportButton.Size = UDim2.new(0, 180, 0, 40)
+teleportButton.Position = UDim2.new(0, 10, 0, 110)
+teleportButton.Text = "Teleport to Land"
+teleportButton.Parent = frame
+teleportButton.BackgroundColor3 = Color3.new(0, 0, 1)
+
+-- Function to chop trees
+function autoChop()
+    while chopping do
+        local trees = workspace:GetChildren()
+        for _, tree in ipairs(trees) do
+            if tree:IsA("Tree") and (tree.Position - humanoidRootPart.Position).magnitude < 30 then
+                humanoidRootPart.CFrame = tree.CFrame * CFrame.new(0, 3, 0) -- Move above the tree
+                wait(0.1)
+                local clickDetector = tree:FindFirstChildOfClass("ClickDetector")
+                if clickDetector then
+                    fireclickdetector(clickDetector) -- Activate tree click detector
+                end
+                wait(2) -- Wait for the chopping animation
+            end
+        end
+        wait(1) -- Wait before checking for trees again
+    end
+end
+
+-- Function to teleport to home
+function teleportToLand()
+    humanoidRootPart.CFrame = CFrame.new(homePosition) -- Move to your land's position
+end
+
+-- Button functions
+chopButton.MouseButton1Click:Connect(function()
+    chopping = true
+    autoChop()
+end)
+
+stopButton.MouseButton1Click:Connect(function()
+    chopping = false
+end)
+
+teleportButton.MouseButton1Click:Connect(function()
+    teleportToLand()
+end)
+
+-- Cleanup GUI when the player leaves
+player.AncestryChanged:Connect(function(_, parent)
+    if not parent then
+        screenGui:Destroy()
+    end
+end)

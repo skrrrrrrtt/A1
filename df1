@@ -1,0 +1,74 @@
+-- Advanced FPS Booster Script for Roblox Jailbreak
+local player = game.Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+local runService = game:GetService("RunService")
+local textService = game:GetService("TextService")
+local screenGui = Instance.new("ScreenGui")
+local fpsLabel = Instance.new("TextLabel")
+
+-- Configure the FPS label
+fpsLabel.Size = UDim2.new(0, 100, 0, 50)
+fpsLabel.Position = UDim2.new(0.5, -50, 0, 10)
+fpsLabel.BackgroundTransparency = 1
+fpsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+fpsLabel.Font = Enum.Font.SourceSans
+fpsLabel.TextSize = 24
+fpsLabel.TextStrokeTransparency = 0.5
+fpsLabel.Parent = screenGui
+
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Function to calculate and display FPS
+local function calculateFPS()
+    local frameCount = 0
+    local startTime = tick()
+    
+    while true do
+        frameCount = frameCount + 1
+        if tick() - startTime >= 1 then
+            fpsLabel.Text = "FPS: " .. frameCount
+            frameCount = 0
+            startTime = tick()
+        end
+        runService.RenderStepped:Wait()
+    end
+end
+
+-- Optimizing settings for performance
+local function optimizeSettings()
+    -- Set Quality Level to the lowest
+    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+
+    -- Disable shadows by setting Lighting properties
+    local lighting = game:GetService("Lighting")
+    lighting.ShadowColor = Color3.fromRGB(0, 0, 0) -- Set shadow color to black
+    lighting.ShadowSoftness = 0 -- Disable softness
+    lighting.GlobalShadows = false -- Disable global shadows
+
+    -- Adjust texture quality
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Texture") or v:IsA("Decal") then
+            v.Transparency = 1 -- Make all textures fully transparent
+        elseif v:IsA("BasePart") then
+            v.Material = Enum.Material.SmoothPlastic -- Set material to something low quality
+        end
+    end
+
+    -- Disable particles
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v.Enabled = false
+        end
+    end
+    
+    -- Set Lighting settings for low quality
+    lighting.Brightness = 0
+    lighting.FogEnd = 0
+    lighting.Ambient = Color3.new(0, 0, 0)
+    lighting.ColorShift_Bottom = Color3.new(0, 0, 0)
+    lighting.ColorShift_Top = Color3.new(0, 0, 0)
+end
+
+-- Execute functions
+optimizeSettings()
+calculateFPS()

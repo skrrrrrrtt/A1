@@ -1,0 +1,90 @@
+-- Enhanced FPS Booster for Roblox Jailbreak
+
+-- Step 1: Notification Function for Roblox-Style Messages
+local StarterGui = game:GetService("StarterGui")
+
+-- Function to send notifications
+local function sendNotification(title, text, duration)
+    StarterGui:SetCore("SendNotification", {
+        Title = title;  -- Title of the notification
+        Text = text;    -- Body of the notification
+        Duration = duration or 5;  -- Duration the notification is displayed (default is 5 seconds)
+    })
+end
+
+-- Step 2: FPS Counter
+local RunService = game:GetService("RunService")
+local lastTime = tick()
+local fps = 0
+
+RunService.RenderStepped:Connect(function()
+    local currentTime = tick()
+    fps = math.floor(1 / (currentTime - lastTime))
+    lastTime = currentTime
+    print("FPS: " .. tostring(fps))
+end)
+
+-- Step 3: Apply FPS boosting optimizations with notifications
+
+-- Function to remove unnecessary parts
+local function removeUnnecessaryParts()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("MeshPart") or obj:IsA("Part") then
+            if obj.Transparency > 0.9 then
+                obj:Destroy()
+            end
+        end
+    end
+end
+
+-- Remove textures and decals
+sendNotification("FPS Booster", "Removing textures and decals...", 3)
+for _, obj in pairs(game:GetDescendants()) do
+    if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SpecialMesh") then
+        obj:Destroy()
+    end
+end
+
+-- Lower render quality and distance
+sendNotification("FPS Booster", "Lowering render quality...", 3)
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01  -- Minimum quality level
+
+-- Disable shadows
+sendNotification("FPS Booster", "Disabling shadows...", 3)
+game:GetService("Lighting").GlobalShadows = false
+
+-- Disable Terrain Effects
+sendNotification("FPS Booster", "Disabling terrain and water effects...", 3)
+workspace.Terrain.WaterWaveSize = 0
+workspace.Terrain.WaterWaveSpeed = 0
+workspace.Terrain.WaterReflectance = 0
+workspace.Terrain.WaterTransparency = 1
+workspace.Terrain.Decoration = false
+
+-- Disable post-processing
+sendNotification("FPS Booster", "Disabling post-processing effects...", 3)
+for _, v in pairs(game:GetService("Lighting"):GetChildren()) do
+    if v:IsA("PostEffect") then
+        v.Enabled = false
+    end
+end
+
+-- Remove particles (such as smoke, explosions, etc.)
+sendNotification("FPS Booster", "Removing particles...", 3)
+for _, v in pairs(game:GetDescendants()) do
+    if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
+        v:Destroy()
+    end
+end
+
+-- Remove unnecessary parts and models
+sendNotification("FPS Booster", "Removing unnecessary parts...", 3)
+removeUnnecessaryParts()
+
+-- Step 4: Auto-cleanup function to remove new unnecessary objects
+game:GetService("RunService").Stepped:Connect(function()
+    removeUnnecessaryParts()
+end)
+
+-- Final notification after applying all optimizations
+sendNotification("FPS Booster", "FPS Booster Applied! Enjoy your performance boost.", 5)

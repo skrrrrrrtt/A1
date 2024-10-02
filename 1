@@ -1,0 +1,119 @@
+-- Super Efficient FPS Booster for Roblox Jailbreak with Notifications and FPS Counter
+
+-- Step 1: Create a notification and FPS counter GUI
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local FPSCounter = Instance.new("TextLabel")
+
+-- Check if the player is running this on a GUI-enabled device
+if syn or fluxus then
+    ScreenGui.Parent = game.CoreGui
+else
+    ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+end
+
+-- Notification Frame setup (bottom-right corner)
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Position = UDim2.new(1, -210, 1, -120)  -- Bottom-right corner
+Frame.Size = UDim2.new(0, 200, 0, 100)
+Frame.Visible = true
+
+-- Notification Text setup
+TextLabel.Parent = Frame
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1
+TextLabel.Size = UDim2.new(1, 0, 1, 0)
+TextLabel.Font = Enum.Font.SourceSansBold
+TextLabel.Text = "FPS Booster Initializing..."
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+
+-- FPS Counter setup (top-left corner)
+FPSCounter.Parent = ScreenGui
+FPSCounter.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+FPSCounter.BackgroundTransparency = 0.5
+FPSCounter.Position = UDim2.new(0, 10, 0, 10)  -- Top-left corner
+FPSCounter.Size = UDim2.new(0, 100, 0, 50)
+FPSCounter.Font = Enum.Font.SourceSansBold
+FPSCounter.Text = "FPS: 0"
+FPSCounter.TextColor3 = Color3.fromRGB(255, 255, 255)
+FPSCounter.TextScaled = true
+
+-- Function to update the notification
+local function updateNotification(message)
+    TextLabel.Text = message
+    wait(1)  -- Display each notification for 1 second
+end
+
+-- FPS Counter logic
+local RunService = game:GetService("RunService")
+local lastTime = tick()
+local fps = 0
+
+RunService.RenderStepped:Connect(function()
+    -- Calculate FPS
+    local currentTime = tick()
+    fps = math.floor(1 / (currentTime - lastTime))
+    lastTime = currentTime
+
+    -- Update FPS counter text
+    FPSCounter.Text = "FPS: " .. tostring(fps)
+end)
+
+-- Step 2: FPS Booster Actions with Notifications
+
+-- Remove textures and decals (massive FPS boost, makes game look basic)
+updateNotification("Removing textures and decals...")
+for _, obj in pairs(game:GetDescendants()) do
+    if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SpecialMesh") then
+        obj:Destroy()
+    end
+end
+
+-- Lower render quality and distance
+updateNotification("Lowering render quality...")
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01  -- Minimum quality level
+
+-- Disable shadows
+updateNotification("Disabling shadows...")
+game:GetService("Lighting").GlobalShadows = false
+
+-- Remove Terrain Effects
+updateNotification("Disabling terrain and water effects...")
+workspace.Terrain.WaterWaveSize = 0
+workspace.Terrain.WaterWaveSpeed = 0
+workspace.Terrain.WaterReflectance = 0
+workspace.Terrain.WaterTransparency = 1
+workspace.Terrain.Decoration = false
+
+-- Disable post-processing
+updateNotification("Disabling post-processing effects...")
+for _, v in pairs(game:GetService("Lighting"):GetChildren()) do
+    if v:IsA("PostEffect") then
+        v.Enabled = false
+    end
+end
+
+-- Remove particles (such as smoke, explosions, etc.)
+updateNotification("Removing particles...")
+for _, v in pairs(game:GetDescendants()) do
+    if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
+        v:Destroy()
+    end
+end
+
+-- Step 3: Auto-cleanup function to remove new unnecessary objects (keeps game light even if new items spawn)
+game:GetService("RunService").Stepped:Connect(function()
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SpecialMesh") then
+            obj:Destroy()
+        elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+            obj:Destroy()
+        end
+    end
+end)
+
+-- Completion notification
+updateNotification("FPS Booster Applied! Enjoy your performance boost.")

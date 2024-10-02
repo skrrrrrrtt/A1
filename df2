@@ -1,0 +1,117 @@
+-- Advanced FPS Booster Script for Roblox Jailbreak
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local camera = game.Workspace.CurrentCamera
+local runService = game:GetService("RunService")
+local userInputService = game:GetService("UserInputService")
+local screenGui = Instance.new("ScreenGui")
+local fpsLabel = Instance.new("TextLabel")
+local stopButton = Instance.new("TextButton")
+local isRunning = true
+
+-- Configure the FPS label
+fpsLabel.Size = UDim2.new(0, 100, 0, 50)
+fpsLabel.Position = UDim2.new(0.5, -50, 0, 10)
+fpsLabel.BackgroundTransparency = 1
+fpsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+fpsLabel.Font = Enum.Font.SourceSans
+fpsLabel.TextSize = 24
+fpsLabel.TextStrokeTransparency = 0.5
+fpsLabel.Parent = screenGui
+
+-- Configure the Stop button
+stopButton.Size = UDim2.new(0, 100, 0, 50)
+stopButton.Position = UDim2.new(0.5, -50, 0.5, -25)
+stopButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+stopButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+stopButton.Font = Enum.Font.SourceSans
+stopButton.TextSize = 24
+stopButton.Text = "Stop Script"
+stopButton.Parent = screenGui
+
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Function to calculate and display FPS above the character's head
+local function calculateFPS()
+    local frameCount = 0
+    local startTime = tick()
+    
+    while isRunning do
+        frameCount = frameCount + 1
+        if tick() - startTime >= 1 then
+            fpsLabel.Text = "FPS: " .. frameCount
+            frameCount = 0
+            startTime = tick()
+        end
+        runService.RenderStepped:Wait()
+    end
+end
+
+-- Function to optimize settings for performance
+local function optimizeSettings()
+    -- Set Quality Level to the lowest
+    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+
+    -- Disable shadows by setting Lighting properties
+    local lighting = game:GetService("Lighting")
+    lighting.GlobalShadows = false -- Disable global shadows
+
+    -- Adjust texture quality
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Texture") or v:IsA("Decal") then
+            v.Transparency = 0.9 -- Make all textures nearly transparent
+        elseif v:IsA("BasePart") then
+            v.Material = Enum.Material.Plastic -- Set material to something low quality
+            v.Color = Color3.fromRGB(150, 150, 150) -- Make the color dull for low visibility
+            v.Transparency = 0.9 -- Make parts nearly invisible
+        end
+    end
+
+    -- Disable particles
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v.Enabled = false
+        end
+    end
+
+    -- Remove buildings by making them invisible
+    for _, v in pairs(workspace:GetChildren()) do
+        if v:IsA("Model") then
+            v:Destroy() -- Completely remove models for better performance
+        end
+    end
+
+    -- Set Lighting settings for low quality
+    lighting.Brightness = 0
+    lighting.FogEnd = 0
+    lighting.Ambient = Color3.new(0, 0, 0)
+end
+
+-- Function to update FPS label position above the character's head
+local function updateFPSTextPosition()
+    while isRunning do
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            fpsLabel.Position = UDim2.new(0.5, -50, 0, character.HumanoidRootPart.Position.Y + 5)
+        end
+        runService.RenderStepped:Wait()
+    end
+end
+
+-- Function to stop the script
+local function stopScript()
+    isRunning = false
+    fpsLabel.Text = "FPS: Stopped"
+    stopButton.Text = "Script Stopped"
+    stopButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Change button color to indicate stopping
+    
+    -- Remove the GUI
+    screenGui:Destroy()
+end
+
+-- Connect button click event to stop the script
+stopButton.MouseButton1Click:Connect(stopScript)
+
+-- Execute functions
+optimizeSettings()
+calculateFPS()
+updateFPSTextPosition()

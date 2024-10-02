@@ -1,0 +1,98 @@
+-- Super Efficient FPS Booster for Roblox Jailbreak with 3D Text Notifications and FPS Display
+
+-- Step 1: Create a BillboardGui (3D text)
+local BillboardGui = Instance.new("BillboardGui")
+local TextLabel = Instance.new("TextLabel")
+
+-- Setup BillboardGui
+BillboardGui.Size = UDim2.new(0, 200, 0, 50)  -- Size of the 3D text box
+BillboardGui.StudsOffset = Vector3.new(0, 3, 0)  -- Position it slightly above the player's head
+BillboardGui.Adornee = game.Players.LocalPlayer.Character.Head  -- Attach it to the player's head (or any part)
+
+-- Setup TextLabel for FPS and notifications
+TextLabel.Parent = BillboardGui
+TextLabel.Size = UDim2.new(1, 0, 1, 0)
+TextLabel.BackgroundTransparency = 1
+TextLabel.TextScaled = true
+TextLabel.Font = Enum.Font.SourceSansBold
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.Text = "Initializing FPS Booster..."
+
+-- Parent BillboardGui to the player's character
+BillboardGui.Parent = game.Players.LocalPlayer.Character.Head
+
+-- Function to update the 3D text (for both FPS and notifications)
+local function updateText(message)
+    TextLabel.Text = message
+end
+
+-- Step 2: FPS Counter using 3D Text
+
+local RunService = game:GetService("RunService")
+local lastTime = tick()
+local fps = 0
+
+RunService.RenderStepped:Connect(function()
+    -- Calculate FPS
+    local currentTime = tick()
+    fps = math.floor(1 / (currentTime - lastTime))
+    lastTime = currentTime
+
+    -- Update 3D text with current FPS
+    updateText("FPS: " .. tostring(fps))
+end)
+
+-- Step 3: FPS Booster Actions with Notifications
+
+-- Remove textures and decals (massive FPS boost, makes game look basic)
+updateText("Removing textures and decals...")
+for _, obj in pairs(game:GetDescendants()) do
+    if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SpecialMesh") then
+        obj:Destroy()
+    end
+end
+
+-- Lower render quality and distance
+updateText("Lowering render quality...")
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01  -- Minimum quality level
+
+-- Disable shadows
+updateText("Disabling shadows...")
+game:GetService("Lighting").GlobalShadows = false
+
+-- Remove Terrain Effects
+updateText("Disabling terrain and water effects...")
+workspace.Terrain.WaterWaveSize = 0
+workspace.Terrain.WaterWaveSpeed = 0
+workspace.Terrain.WaterReflectance = 0
+workspace.Terrain.WaterTransparency = 1
+workspace.Terrain.Decoration = false
+
+-- Disable post-processing
+updateText("Disabling post-processing effects...")
+for _, v in pairs(game:GetService("Lighting"):GetChildren()) do
+    if v:IsA("PostEffect") then
+        v.Enabled = false
+    end
+end
+
+-- Remove particles (such as smoke, explosions, etc.)
+updateText("Removing particles...")
+for _, v in pairs(game:GetDescendants()) do
+    if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
+        v:Destroy()
+    end
+end
+
+-- Step 4: Auto-cleanup function to remove new unnecessary objects (keeps game light even if new items spawn)
+game:GetService("RunService").Stepped:Connect(function()
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SpecialMesh") then
+            obj:Destroy()
+        elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+            obj:Destroy()
+        end
+    end
+end)
+
+updateText("FPS Booster Applied! Enjoy your performance boost.")

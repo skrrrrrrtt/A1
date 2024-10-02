@@ -1,0 +1,91 @@
+-- Enhanced FPS Booster for Roblox Jailbreak
+
+-- Step 1: Notification Function for Roblox-Style Messages
+local StarterGui = game:GetService("StarterGui")
+
+-- Function to send notifications
+local function sendNotification(title, text, duration)
+    StarterGui:SetCore("SendNotification", {
+        Title = title;  -- Title of the notification
+        Text = text;    -- Body of the notification
+        Duration = duration or 5;  -- Duration the notification is displayed (default is 5 seconds)
+    })
+end
+
+-- Step 2: FPS Counter
+local RunService = game:GetService("RunService")
+local lastTime = tick()
+local fps = 0
+
+RunService.RenderStepped:Connect(function()
+    local currentTime = tick()
+    fps = math.floor(1 / (currentTime - lastTime))
+    lastTime = currentTime
+end)
+
+-- Step 3: Apply FPS boosting optimizations with notifications
+
+-- Function to remove unnecessary parts and simplify textures
+local function optimizeGame()
+    -- Remove decals, textures, and meshes
+    sendNotification("FPS Booster", "Removing decals and textures...", 3)
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SpecialMesh") then
+            obj:Destroy()
+        end
+    end
+
+    -- Reduce parts and meshes quality
+    sendNotification("FPS Booster", "Simplifying meshes and parts...", 3)
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("MeshPart") then
+            obj.MeshId = "" -- Remove mesh to make it a basic part
+        elseif obj:IsA("Part") then
+            obj.Material = Enum.Material.Plastic -- Change material to reduce rendering complexity
+        end
+    end
+
+    -- Remove particles (such as smoke, explosions, etc.)
+    sendNotification("FPS Booster", "Removing particles...", 3)
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
+            v:Destroy()
+        end
+    end
+
+    -- Final notification after applying optimizations
+    sendNotification("FPS Booster", "Optimization complete! Enjoy your performance boost.", 5)
+end
+
+-- Apply optimizations
+optimizeGame()
+
+-- Step 4: Auto-cleanup function to remove new unnecessary objects
+RunService.Stepped:Connect(function()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SpecialMesh") then
+            obj:Destroy()
+        end
+    end
+end)
+
+-- FPS Counter Display
+local screenGui = Instance.new("ScreenGui")
+local fpsLabel = Instance.new("TextLabel")
+
+-- Set up FPS Label properties
+fpsLabel.Size = UDim2.new(0, 200, 0, 50)
+fpsLabel.Position = UDim2.new(0.5, -100, 0, 0) -- Centered at the top
+fpsLabel.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+fpsLabel.TextColor3 = Color3.new(1, 1, 1) -- White text
+fpsLabel.Font = Enum.Font.SourceSans -- Default font
+fpsLabel.TextSize = 24
+fpsLabel.Text = "FPS: " .. tostring(fps) -- Initial FPS text
+
+-- Update FPS label every frame
+RunService.RenderStepped:Connect(function()
+    fpsLabel.Text = "FPS: " .. tostring(fps)
+end)
+
+fpsLabel.Parent = screenGui
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")

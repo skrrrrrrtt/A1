@@ -1,0 +1,75 @@
+-- Constants
+local PLAYER = game.Players.LocalPlayer
+local CHARACTER = PLAYER.Character or PLAYER.CharacterAdded:Wait()
+local HUMANOID = CHARACTER:WaitForChild("Humanoid")
+local RS = game:GetService("RunService")
+local VEHICLE_RADIUS = 20 -- Search radius for vehicles
+local ARREST_DISTANCE = 5 -- Distance to get close to the criminal for arresting
+local WAIT_TIME = 0.1 -- Time to wait before checking again
+
+-- Functions
+local function findNearestVehicle()
+    local nearestVehicle = nil
+    local nearestDistance = VEHICLE_RADIUS
+
+    for _, vehicle in pairs(workspace:GetChildren()) do
+        if vehicle:IsA("Vehicle") then
+            local distance = (CHARACTER.HumanoidRootPart.Position - vehicle.Position).magnitude
+            if distance < nearestDistance then
+                nearestDistance = distance
+                nearestVehicle = vehicle
+            end
+        end
+    end
+
+    return nearestVehicle
+end
+
+local function rideVehicle(vehicle)
+    if vehicle and vehicle:IsA("Vehicle") then
+        CHARACTER:SetPrimaryPartCFrame(vehicle.PrimaryPart.CFrame) -- Teleport to vehicle
+        -- Simulate entering the vehicle
+        -- You would replace this with the correct method to enter a vehicle in your game
+        vehicle:Enter() 
+    end
+end
+
+local function followCriminal(criminal)
+    while true do
+        if not criminal or not criminal.Parent then break end
+        local criminalPos = criminal.HumanoidRootPart.Position
+
+        -- Move towards the criminal
+        HUMANOID:MoveTo(criminalPos)
+
+        local distance = (CHARACTER.HumanoidRootPart.Position - criminalPos).magnitude
+        if distance <= ARREST_DISTANCE then
+            -- Simulate arresting action
+            -- Replace with the appropriate method for arresting in your game
+            holdHandcuff() 
+            wait(0.5) -- Wait to simulate arresting time
+            break
+        end
+        wait(WAIT_TIME)
+    end
+end
+
+local function holdHandcuff()
+    -- Logic to hold handcuffs (e.g., animating the handcuff action)
+    -- This would be your custom implementation
+end
+
+-- Main Loop
+while true do
+    wait(WAIT_TIME)
+    local nearestVehicle = findNearestVehicle()
+    if nearestVehicle then
+        rideVehicle(nearestVehicle)
+
+        -- Assuming a method to find criminals is available
+        local criminal = findNearestCriminal() 
+        if criminal then
+            followCriminal(criminal)
+        end
+    end
+end

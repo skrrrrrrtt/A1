@@ -1,0 +1,115 @@
+-- Variables
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 300, 0, 200)
+frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+frame.BorderSizePixel = 0
+
+local startButton = Instance.new("TextButton", frame)
+startButton.Size = UDim2.new(0, 100, 0, 50)
+startButton.Position = UDim2.new(0.5, -50, 0.2, 0)
+startButton.Text = "Start Auto Arrest"
+startButton.BackgroundColor3 = Color3.new(0.2, 0.8, 0.2)
+
+local stopButton = Instance.new("TextButton", frame)
+stopButton.Size = UDim2.new(0, 100, 0, 50)
+stopButton.Position = UDim2.new(0.5, -50, 0.4, 0)
+stopButton.Text = "Stop Auto Arrest"
+stopButton.BackgroundColor3 = Color3.new(0.8, 0.2, 0.2)
+
+local statusLabel = Instance.new("TextLabel", frame)
+statusLabel.Size = UDim2.new(1, 0, 0, 50)
+statusLabel.Position = UDim2.new(0, 0, 0.6, 0)
+statusLabel.Text = "Status: Idle"
+statusLabel.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+statusLabel.TextColor3 = Color3.new(1, 1, 1)
+
+local autoArresting = false
+
+-- Function to find the nearest vehicle
+local function findNearestVehicle()
+    local nearestVehicle = nil
+    local nearestDistance = math.huge
+
+    for _, vehicle in pairs(workspace:GetChildren()) do
+        if vehicle:IsA("Vehicle") then
+            local distance = (humanoidRootPart.Position - vehicle.Position).magnitude
+            if distance < nearestDistance then
+                nearestDistance = distance
+                nearestVehicle = vehicle
+            end
+        end
+    end
+
+    return nearestVehicle
+end
+
+-- Function to find the nearest criminal
+local function findNearestCriminal()
+    local nearestCriminal = nil
+    local nearestDistance = 50 -- Adjust this distance as necessary
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Team.Name == "Criminals" then -- Adjust based on teams in your game
+            local distance = (humanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
+            if distance < nearestDistance then
+                nearestDistance = distance
+                nearestCriminal = player
+            end
+        end
+    end
+
+    return nearestCriminal
+end
+
+-- Function to follow the criminal
+local function followCriminal(criminal)
+    local vehicle = findNearestVehicle()
+    if vehicle then
+        -- Move to vehicle
+        humanoidRootPart.CFrame = vehicle.PrimaryPart.CFrame * CFrame.new(0, 2, 0) -- Adjust height if needed
+        wait(0.5) -- Wait for character to be at the vehicle
+
+        -- Enter vehicle (you need to implement this based on your game's vehicle system)
+        -- Example: vehicle:Enter()
+
+        -- Move vehicle to criminal
+        while autoArresting do
+            if criminal and criminal.Character then
+                vehicle.PrimaryPart.CFrame = CFrame.new(criminal.Character.HumanoidRootPart.Position) -- Move to criminal
+            end
+            wait(0.1) -- Adjust as necessary
+        end
+    end
+end
+
+-- Function to start auto arrest
+local function startAutoArrest()
+    autoArresting = true
+    statusLabel.Text = "Status: Auto Arresting"
+    
+    while autoArresting do
+        local criminal = findNearestCriminal()
+        if criminal then
+            followCriminal(criminal)
+        else
+            statusLabel.Text = "Status: No Criminals Nearby"
+            wait(1) -- Wait before checking again
+        end
+        wait(0.1)
+    end
+end
+
+-- Function to stop auto arrest
+local function stopAutoArrest()
+    autoArresting = false
+    statusLabel.Text = "Status: Idle"
+end
+
+-- Button connections
+startButton.MouseButton1Click:Connect(startAutoArrest)
+stopButton.MouseButton1Click:Connect(stopAutoArrest)

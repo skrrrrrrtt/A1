@@ -1,0 +1,76 @@
+-- Fluxus Silent Aim + Kill Aura Script
+-- Educational purposes only! Be cautious about using such scripts in games.
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local mouse = LocalPlayer:GetMouse()
+
+local killRadius = 50 -- Radius for kill aura
+local silentAimActive = true -- Toggle for silent aim
+local killAuraActive = true -- Toggle for kill aura
+
+-- Function to get the nearest player for silent aim
+local function getNearestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local distance = (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                closestPlayer = player
+            end
+        end
+    end
+    
+    return closestPlayer
+end
+
+-- Silent Aim functionality
+local function silentAim()
+    local nearestPlayer = getNearestPlayer()
+    if nearestPlayer and nearestPlayer.Character and nearestPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        -- Redirect mouse hit to the nearest player's HumanoidRootPart
+        mouse.TargetFilter = nearestPlayer.Character
+        mouse.Hit = nearestPlayer.Character.HumanoidRootPart.CFrame
+    end
+end
+
+-- Kill Aura functionality
+local function killAura()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") then
+            local distance = (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+            if distance <= killRadius then
+                -- Damage player if within radius
+                player.Character.Humanoid.Health = 0
+            end
+        end
+    end
+end
+
+-- Continuously check and apply the silent aim and kill aura
+RunService.RenderStepped:Connect(function()
+    if silentAimActive then
+        silentAim()
+    end
+    
+    if killAuraActive then
+        killAura()
+    end
+end)
+
+-- Hotkeys to toggle silent aim and kill aura
+mouse.KeyDown:Connect(function(key)
+    if key == "k" then -- Press "k" to toggle silent aim
+        silentAimActive = not silentAimActive
+        print("Silent Aim: " .. tostring(silentAimActive))
+    end
+    
+    if key == "l" then -- Press "l" to toggle kill aura
+        killAuraActive = not killAuraActive
+        print("Kill Aura: " .. tostring(killAuraActive))
+    end
+end)

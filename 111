@@ -1,0 +1,138 @@
+-- War Tycoon Advanced Script for Fluxus (Android Friendly)
+
+-- Settings
+local autoFarmEnabled = false
+local combatHackEnabled = false
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "WarTycoonGui"
+
+-- Create main frame for the GUI
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
+MainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+MainFrame.Visible = false -- Initially hidden
+
+-- Cool rounded corners
+local UICorner = Instance.new("UICorner")
+UICorner.Parent = MainFrame
+UICorner.CornerRadius = UDim.new(0, 15)
+
+-- Open/Close button
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Parent = ScreenGui
+ToggleButton.Size = UDim2.new(0, 80, 0, 50)
+ToggleButton.Position = UDim2.new(0, 10, 0, 10)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+ToggleButton.Text = "Open GUI"
+ToggleButton.TextSize = 18
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Function to toggle the GUI
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+    if MainFrame.Visible then
+        ToggleButton.Text = "Close GUI"
+    else
+        ToggleButton.Text = "Open GUI"
+    end
+end)
+
+-- Auto-Farming Button
+local AutoFarmButton = Instance.new("TextButton")
+AutoFarmButton.Parent = MainFrame
+AutoFarmButton.Size = UDim2.new(0, 250, 0, 50)
+AutoFarmButton.Position = UDim2.new(0.5, -125, 0.1, 0)
+AutoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+AutoFarmButton.Text = "Enable Auto Farm"
+AutoFarmButton.TextSize = 20
+AutoFarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+AutoFarmButton.MouseButton1Click:Connect(function()
+    autoFarmEnabled = not autoFarmEnabled
+    if autoFarmEnabled then
+        AutoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        AutoFarmButton.Text = "Auto Farm: ON"
+        startAutoFarming()
+    else
+        AutoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+        AutoFarmButton.Text = "Auto Farm: OFF"
+    end
+end)
+
+-- Combat Hacks Button
+local CombatHackButton = Instance.new("TextButton")
+CombatHackButton.Parent = MainFrame
+CombatHackButton.Size = UDim2.new(0, 250, 0, 50)
+CombatHackButton.Position = UDim2.new(0.5, -125, 0.3, 0)
+CombatHackButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CombatHackButton.Text = "Enable Combat Hacks"
+CombatHackButton.TextSize = 20
+CombatHackButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+CombatHackButton.MouseButton1Click:Connect(function()
+    combatHackEnabled = not combatHackEnabled
+    if combatHackEnabled then
+        CombatHackButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        CombatHackButton.Text = "Combat Hacks: ON"
+        startCombatHacks()
+    else
+        CombatHackButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        CombatHackButton.Text = "Combat Hacks: OFF"
+    end
+end)
+
+-- Function to start Auto-Farming
+function startAutoFarming()
+    while autoFarmEnabled do
+        -- Auto collect cash
+        local cashCollector = game:GetService("Workspace"):FindFirstChild("CashCollector")
+        if cashCollector then
+            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, cashCollector, 0)
+            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, cashCollector, 1)
+        end
+
+        -- Auto upgrade tycoon
+        local tycoonItems = game:GetService("Workspace"):FindFirstChild("TycoonUpgrades")
+        if tycoonItems then
+            for _, item in pairs(tycoonItems:GetChildren()) do
+                if item:IsA("TouchTransmitter") then
+                    firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, item, 0)
+                    firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, item, 1)
+                end
+            end
+        end
+        wait(2) -- Delay between farming cycles
+    end
+end
+
+-- Function to start Combat Hacks
+function startCombatHacks()
+    -- Basic ESP for enemies
+    while combatHackEnabled do
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local character = player.Character
+                if character then
+                    -- Add ESP Box
+                    if not character:FindFirstChild("ESPBox") then
+                        local espBox = Instance.new("BoxHandleAdornment")
+                        espBox.Name = "ESPBox"
+                        espBox.Size = Vector3.new(4, 6, 4)
+                        espBox.Adornee = character:FindFirstChild("HumanoidRootPart")
+                        espBox.Color3 = Color3.fromRGB(255, 0, 0)
+                        espBox.AlwaysOnTop = true
+                        espBox.ZIndex = 10
+                        espBox.Transparency = 0.7
+                        espBox.Parent = character
+                    end
+                end
+            end
+        end
+        wait(1) -- Refresh ESP every second
+    end
+end

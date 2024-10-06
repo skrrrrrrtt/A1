@@ -1,0 +1,242 @@
+-- Combined ESP & Aimbot Script with Cool GUI and Enhanced Logic (Fluxus Compatible)
+
+-- Variables for ESP, Aimbot, and Features Toggles
+local espEnabled = false
+local aimbotEnabled = false
+local showLines = true
+local showNames = true
+local showHealth = true
+local aimAtHead = true -- Aimbot target part
+local aimRadius = 500 -- Aimbot range
+local guiVisible = true -- Track GUI visibility
+
+-- Store Drawing Objects for Cleanup
+local espElements = {}
+
+-- Create the GUI
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local ToggleButton = Instance.new("TextButton")
+local ESPButton = Instance.new("TextButton")
+local AimbotButton = Instance.new("TextButton")
+local LineToggleButton = Instance.new("TextButton")
+local NameToggleButton = Instance.new("TextButton")
+local HealthToggleButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
+
+-- GUI Setup (Mobile Friendly)
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- MainFrame (The actual window)
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15) -- Dark background
+MainFrame.Size = UDim2.new(0, 250, 0, 350)
+MainFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
+MainFrame.Visible = true -- Visible by default
+
+-- Toggle Button to Open/Close the GUI
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.new(0, 0, 1) -- Blue color
+ToggleButton.Size = UDim2.new(0, 100, 0, 50)
+ToggleButton.Position = UDim2.new(0.05, 0, 0.85, 0)
+ToggleButton.Text = "Show GUI"
+ToggleButton.TextScaled = true
+
+-- ESP Button
+ESPButton.Parent = MainFrame
+ESPButton.BackgroundColor3 = Color3.new(0.2, 0.7, 0.2) -- Green button for ESP
+ESPButton.Position = UDim2.new(0.1, 0, 0.1, 0)
+ESPButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+ESPButton.Text = "Toggle ESP"
+ESPButton.TextScaled = true
+
+-- Aimbot Button
+AimbotButton.Parent = MainFrame
+AimbotButton.BackgroundColor3 = Color3.new(0.7, 0.2, 0.2) -- Red button for Aimbot
+AimbotButton.Position = UDim2.new(0.1, 0, 0.3, 0)
+AimbotButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+AimbotButton.Text = "Toggle Aimbot"
+AimbotButton.TextScaled = true
+
+-- Line Toggle Button
+LineToggleButton.Parent = MainFrame
+LineToggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 1) -- Blue for Line Toggle
+LineToggleButton.Position = UDim2.new(0.1, 0, 0.5, 0)
+LineToggleButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+LineToggleButton.Text = "Toggle ESP Lines"
+LineToggleButton.TextScaled = true
+
+-- Name Toggle Button
+NameToggleButton.Parent = MainFrame
+NameToggleButton.BackgroundColor3 = Color3.new(0.8, 0.8, 0.2) -- Yellow for Name Toggle
+NameToggleButton.Position = UDim2.new(0.1, 0, 0.65, 0)
+NameToggleButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+NameToggleButton.Text = "Toggle ESP Names"
+NameToggleButton.TextScaled = true
+
+-- Health Toggle Button
+HealthToggleButton.Parent = MainFrame
+HealthToggleButton.BackgroundColor3 = Color3.new(0.2, 0.8, 0.2) -- Green for Health Toggle
+HealthToggleButton.Position = UDim2.new(0.1, 0, 0.8, 0)
+HealthToggleButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+HealthToggleButton.Text = "Toggle ESP Health"
+HealthToggleButton.TextScaled = true
+
+-- Close Button for GUI
+CloseButton.Parent = MainFrame
+CloseButton.BackgroundColor3 = Color3.new(1, 0.5, 0) -- Orange close button
+CloseButton.Position = UDim2.new(0.1, 0, 0.95, 0)
+CloseButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+CloseButton.Text = "Close GUI"
+CloseButton.TextScaled = true
+
+-- Toggle GUI Visibility
+ToggleButton.MouseButton1Click:Connect(function()
+    guiVisible = not guiVisible
+    MainFrame.Visible = guiVisible
+    ToggleButton.Text = guiVisible and "Hide GUI" or "Show GUI"
+end)
+
+-- ESP Button Logic
+ESPButton.MouseButton1Click:Connect(function()
+    espEnabled = not espEnabled
+    if espEnabled then
+        ESPButton.BackgroundColor3 = Color3.new(0, 1, 0) -- Green when ON
+    else
+        ESPButton.BackgroundColor3 = Color3.new(0.2, 0.7, 0.2) -- Default Green
+        -- Clear existing ESP elements
+        for _, element in pairs(espElements) do
+            element:Remove()
+        end
+        espElements = {} -- Clear the list
+    end
+end)
+
+-- Aimbot Button Logic
+AimbotButton.MouseButton1Click:Connect(function()
+    aimbotEnabled = not aimbotEnabled
+    AimbotButton.BackgroundColor3 = aimbotEnabled and Color3.new(1, 0, 0) or Color3.new(0.7, 0.2, 0.2)
+end)
+
+-- Line Toggle Button Logic
+LineToggleButton.MouseButton1Click:Connect(function()
+    showLines = not showLines
+end)
+
+-- Name Toggle Button Logic
+NameToggleButton.MouseButton1Click:Connect(function()
+    showNames = not showNames
+end)
+
+-- Health Toggle Button Logic
+HealthToggleButton.MouseButton1Click:Connect(function()
+    showHealth = not showHealth
+end)
+
+-- Close GUI Button Logic
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    ToggleButton.Text = "Show GUI"
+    guiVisible = false
+end)
+
+-- ESP Function
+local function DrawESP()
+    if not espEnabled then return end
+
+    -- Clear existing ESP elements if ESP is toggled off
+    for _, element in pairs(espElements) do
+        element:Remove()
+    end
+    espElements = {}
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer and player.Character then
+            local character = player.Character
+            local head = character:FindFirstChild("Head")
+            local humanoid = character:FindFirstChild("Humanoid")
+
+            if head and humanoid then
+                local screenPosition, onScreen = workspace.CurrentCamera:WorldToScreenPoint(head.Position)
+
+                if onScreen then
+                    -- Draw Line
+                    if showLines then
+                        local line = Drawing.new("Line")
+                        line.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y)
+                        line.To = Vector2.new(screenPosition.X, screenPosition.Y)
+                        line.Color = Color3.new(1, 1, 1) -- White line
+                        line.Thickness = 2
+                        line.Visible = true
+                        table.insert(espElements, line)
+                    end
+
+                    -- Draw Name
+                    if showNames then
+                        local nameTag = Drawing.new("Text")
+                        nameTag.Text = player.Name
+                        nameTag.Position = Vector2.new(screenPosition.X, screenPosition.Y - 25)
+                        nameTag.Size = 20
+                        nameTag.Color = Color3.new(1, 1, 1) -- White text
+                        nameTag.Center = true
+                        nameTag.Visible = true
+                        table.insert(espElements, nameTag)
+                    end
+
+                    -- Draw Health
+                    if showHealth then
+                        local healthBar = Drawing.new("Text")
+                        healthBar.Text = "HP: " .. math.floor(humanoid.Health) .. "/" .. math.floor(humanoid.MaxHealth)
+                        healthBar.Position = Vector2.new(screenPosition.X, screenPosition.Y - 10)
+                        healthBar.Size = 18
+                        healthBar.Color = Color3.new(0, 1, 0) -- Green health text
+                        healthBar.Center = true
+                        healthBar.Visible = true
+                        table.insert(espElements, healthBar)
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Get Closest Player Logic
+local function GetClosestPlayer()
+    local closestPlayer = nil
+    local closestDistance = aimRadius
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local character = player.Character
+            local humanoidRootPart = character.HumanoidRootPart
+            local distance = (humanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+
+            if distance < closestDistance then
+                closestDistance = distance
+                closestPlayer = player
+            end
+        end
+    end
+    return closestPlayer
+end
+
+-- Aimbot Functionality
+local function AimAtTarget()
+    if not aimbotEnabled then return end
+    local targetPlayer = GetClosestPlayer()
+
+    if targetPlayer then
+        local targetPart = targetPlayer.Character:FindFirstChild(aimAtHead and "Head" or "HumanoidRootPart")
+        if targetPart then
+            workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, targetPart.Position)
+        end
+    end
+end
+
+-- Main Loop
+game:GetService("RunService").RenderStepped:Connect(function()
+    DrawESP()
+    AimAtTarget()
+end)
+

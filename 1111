@@ -1,0 +1,147 @@
+-- War Tycoon Script with Combat Hacks Submenu for Fluxus (Android Friendly)
+
+-- Settings
+local autoFarmEnabled = false
+local combatHackEnabled = false
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "WarTycoonGui"
+
+-- Create main frame for the GUI
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
+MainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+MainFrame.Visible = false -- Initially hidden
+
+-- Cool rounded corners
+local UICorner = Instance.new("UICorner")
+UICorner.Parent = MainFrame
+UICorner.CornerRadius = UDim.new(0, 15)
+
+-- Open/Close button
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Parent = ScreenGui
+ToggleButton.Size = UDim2.new(0, 80, 0, 50)
+ToggleButton.Position = UDim2.new(0, 10, 0, 10)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+ToggleButton.Text = "Open GUI"
+ToggleButton.TextSize = 18
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Function to toggle the GUI
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+    if MainFrame.Visible then
+        ToggleButton.Text = "Close GUI"
+    else
+        ToggleButton.Text = "Open GUI"
+    end
+end)
+
+-- Combat Hacks Button
+local CombatHackButton = Instance.new("TextButton")
+CombatHackButton.Parent = MainFrame
+CombatHackButton.Size = UDim2.new(0, 250, 0, 50)
+CombatHackButton.Position = UDim2.new(0.5, -125, 0.1, 0)
+CombatHackButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CombatHackButton.Text = "Combat Hacks"
+CombatHackButton.TextSize = 20
+CombatHackButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Submenu frame for combat hacks
+local CombatFrame = Instance.new("Frame")
+CombatFrame.Parent = ScreenGui
+CombatFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+CombatFrame.Size = UDim2.new(0, 300, 0, 400)
+CombatFrame.Position = UDim2.new(0.5, 0, 0.1, 0)
+CombatFrame.Visible = false -- Initially hidden
+
+local CombatUICorner = Instance.new("UICorner")
+CombatUICorner.Parent = CombatFrame
+CombatUICorner.CornerRadius = UDim.new(0, 15)
+
+-- Function to open combat submenu
+CombatHackButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    CombatFrame.Visible = true
+end)
+
+-- Aimbot Button
+local AimbotButton = Instance.new("TextButton")
+AimbotButton.Parent = CombatFrame
+AimbotButton.Size = UDim2.new(0, 250, 0, 50)
+AimbotButton.Position = UDim2.new(0.5, -125, 0.1, 0)
+AimbotButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+AimbotButton.Text = "Aimbot"
+AimbotButton.TextSize = 20
+AimbotButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- ESP All Player Button
+local ESPButton = Instance.new("TextButton")
+ESPButton.Parent = CombatFrame
+ESPButton.Size = UDim2.new(0, 250, 0, 50)
+ESPButton.Position = UDim2.new(0.5, -125, 0.3, 0)
+ESPButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+ESPButton.Text = "ESP All Players"
+ESPButton.TextSize = 20
+ESPButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Silent Aim Button
+local SilentAimButton = Instance.new("TextButton")
+SilentAimButton.Parent = CombatFrame
+SilentAimButton.Size = UDim2.new(0, 250, 0, 50)
+SilentAimButton.Position = UDim2.new(0.5, -125, 0.5, 0)
+SilentAimButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+SilentAimButton.Text = "Silent Aim"
+SilentAimButton.TextSize = 20
+SilentAimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Teleport to Player Button
+local TeleportButton = Instance.new("TextButton")
+TeleportButton.Parent = CombatFrame
+TeleportButton.Size = UDim2.new(0, 250, 0, 50)
+TeleportButton.Position = UDim2.new(0.5, -125, 0.7, 0)
+TeleportButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+TeleportButton.Text = "Teleport to Player"
+TeleportButton.TextSize = 20
+TeleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Back button to return to the main menu
+local BackButton = Instance.new("TextButton")
+BackButton.Parent = CombatFrame
+BackButton.Size = UDim2.new(0, 80, 0, 40)
+BackButton.Position = UDim2.new(0, 10, 0, 10)
+BackButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+BackButton.Text = "Back"
+BackButton.TextSize = 18
+BackButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+BackButton.MouseButton1Click:Connect(function()
+    CombatFrame.Visible = false
+    MainFrame.Visible = true
+end)
+
+-- Add functionality for the buttons (stubs for now)
+AimbotButton.MouseButton1Click:Connect(function()
+    print("Aimbot enabled")
+    -- Aimbot logic will go here
+end)
+
+ESPButton.MouseButton1Click:Connect(function()
+    print("ESP All Players enabled")
+    -- ESP logic will go here
+end)
+
+SilentAimButton.MouseButton1Click:Connect(function()
+    print("Silent Aim enabled")
+    -- Silent aim logic will go here
+end)
+
+TeleportButton.MouseButton1Click:Connect(function()
+    print("Teleport to Player enabled")
+    -- Teleport logic will go here
+end)
